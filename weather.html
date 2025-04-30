@@ -1,182 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Weather App</title>
-
-  <!-- Font Awesome CDN for icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #9fcbea;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px;
-      margin: 0;
-      min-height: 100vh;
-    }
-    .container {
-      background: #67d0f0;
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      max-width: 450px;
-      width: 100%;
-      text-align: center;
-      border: 2px solid #1565c0;
-      transition: transform 0.3s;
-    }
-    h1 {
-      color: #ffffff;
-    }
-    input {
-      width: 100%;
-      padding: 10px;
-      margin: 15px 0;
-      border-radius: 5px;
-      border: 1px solid #90caf9;
-    }
-    button {
-      padding: 10px 20px;
-      background-color: #1565c0;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      margin: 5px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    button:hover {
-      background-color: #0d47a1;
-    }
-    .info {
-      margin-top: 20px;
-      opacity: 0;
-      animation: fadeIn 1s ease-in-out forwards;
-    }
-    .info img {
-      width: 100px;
-      animation: bounce 2s infinite;
-    }
-    .info p {
-      margin: 5px 0;
-      color: #333;
-      font-size: 1.1em;
-    }
-    @keyframes fadeIn {
-      to {
-        opacity: 1;
-      }
-    }
-    @keyframes bounce {
-      0%, 100% {
-        transform: translateY(0);
-      }
-      50% {
-        transform: translateY(-10px);
-      }
-    }
-    @media (max-width: 500px) {
-      .container {
-        padding: 20px;
-      }
-      h1 {
-        font-size: 1.5em;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <link rel="stylesheet" href="weat.css">
 </head>
 <body>
+    <div class="animated-background"></div>
 
-  <div class="container">
-    <h1><i class="fas fa-cloud-sun"></i> Weather Checker</h1>
-    <p>Enter a city or use your current location</p>
+    <div class="weather-app">
+        <h1 class="title">🌥️ Weather App</h1>
 
-    <input type="text" id="cityInput" placeholder="Enter city name" />
-    <button onclick="fetchWeatherByCity()">Search</button>
-    <button onclick="getLocation()">Use My Location</button>
+        <div class="search-bar">
+            <button id="your-weather">Your Weather</button>
+            <button id="search-weather">Search Weather</button>
+        </div>
 
-    <div class="info" id="weatherInfo"></div>
-  </div>
+        <div id="search-section" style="display: none;">
+            <div class="input-field">
+                <input type="text" id="city" placeholder="Enter city name">
+            </div>
+            <div class="weather-boxes" id="weather-container" class="hidden">
+                <div class="box">
+                    <h3>🌡️ Temperature</h3>
+                    <p id="temp">--</p>
+                </div>
+                <div class="box">
+                    <h3>🌞 Sky Condition</h3>
+                    <p id="desc">--</p>
+                </div>
+                <div class="box">
+                    <h3>💧 Humidity</h3>
+                    <p id="humidity">--</p>
+                </div>
+                <div class="box">
+                    <h3>🌬️ Wind</h3>
+                    <p id="wind">--</p>
+                </div>
+                <div class="box">
+                    <h3>🤗 Feels Like</h3>
+                    <p id="feels_like">--</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-  <script>
-    const apiKey = "86c74b2fea58fc86d2aae78ed7abad7a"; // Your OpenWeatherMap API key
+    <!-- Modal for location access -->
+    <div id="location-modal" class="modal">
+        <div class="modal-content">
+            <h2>Allow Location Access</h2>
+            <p>We need your location to show weather data for your area.</p>
+            <div class="modal-buttons">
+                <button onclick="requestLocation()">Allow</button>
+                <button onclick="closeModal()">Deny</button>
+            </div>
+        </div>
+    </div>
 
-    function displayWeather(data) {
-      const weatherInfo = document.getElementById("weatherInfo");
-      const tempC = data.main.temp.toFixed(1);
-      const iconCode = data.weather[0].icon;
-      const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
-
-      weatherInfo.innerHTML = `
-        <h2>${data.name}, ${data.sys.country}</h2>
-        <img src="${iconUrl}" alt="Weather icon" />
-        <p><strong>${data.weather[0].main}</strong> - ${data.weather[0].description}</p>
-        <p><i class="fas fa-thermometer-half"></i> Temperature: ${tempC} °C</p>
-        <p><i class="fas fa-tint"></i> Humidity: ${data.main.humidity}%</p>
-        <p><i class="fas fa-wind"></i> Wind Speed: ${data.wind.speed} m/s</p>
-      `;
-
-      // Re-trigger animation
-      weatherInfo.classList.remove("info");
-      void weatherInfo.offsetWidth;
-      weatherInfo.classList.add("info");
-    }
-
-    function fetchWeatherByCity() {
-      const city = document.getElementById("cityInput").value;
-      if (!city) {
-        alert("Please enter a city name.");
-        return;
-      }
-
-      const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
-
-      fetch(url)
-        .then(response => response.json())
-        .then(data => {
-          if (data.cod === 200) {
-            displayWeather(data);
-          } else {
-            alert("City not found.");
-          }
-        })
-        .catch(error => {
-          alert("Unable to fetch weather data.");
-          console.error(error);
-        });
-    }
-
-    function getLocation() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(position => {
-          const lat = position.coords.latitude;
-          const lon = position.coords.longitude;
-
-          const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
-
-          fetch(url)
-            .then(response => response.json())
-            .then(data => displayWeather(data))
-            .catch(error => {
-              alert("Unable to fetch weather data.");
-              console.error(error);
-            });
-        }, () => {
-          alert("Geolocation not allowed.");
-        });
-      } else {
-        alert("Geolocation not supported by your browser.");
-      }
-    }
-  </script>
-
+    <script src="app.js"></script>
 </body>
 </html>
