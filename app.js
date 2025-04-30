@@ -1,7 +1,5 @@
-// Replace with your actual API key
 const apiKey = "86c74b2fea58fc86d2aae78ed7abad7a";
 
-// Search by city
 function getWeather() {
     const city = document.getElementById('city').value;
     if (city) {
@@ -18,7 +16,6 @@ function getWeather() {
     }
 }
 
-// Display weather info
 function displayWeather(data) {
     document.getElementById('temp').textContent = `${data.main.temp}°C`;
     document.getElementById('desc').textContent = data.weather[0].description;
@@ -28,7 +25,6 @@ function displayWeather(data) {
     document.getElementById('weather-container').classList.remove('hidden');
 }
 
-// Modal Weather
 function displayWeatherInModal(data) {
     const modalContent = document.querySelector('.modal-content');
     modalContent.innerHTML = `
@@ -44,7 +40,6 @@ function displayWeatherInModal(data) {
     `;
 }
 
-// Geo fetch
 function getWeatherByCoordinates(lat, lon) {
     const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`;
     fetch(apiUrl)
@@ -56,7 +51,6 @@ function getWeatherByCoordinates(lat, lon) {
         });
 }
 
-// Location Request
 function requestLocation() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
@@ -97,7 +91,7 @@ function showModal() {
     document.querySelector('.weather-app').style.display = 'none';
 }
 
-// Event Listeners
+
 document.getElementById('search-weather').addEventListener('click', () => {
     document.getElementById('search-section').style.display = 'block';
     document.getElementById('weather-container').classList.add('hidden');
